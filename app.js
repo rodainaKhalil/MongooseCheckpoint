@@ -61,6 +61,26 @@ app.get('/create-people', (req, res) => {
         .catch(err => {
             console.log(err);
         });
+});
+
+// Create Multiple People using arrayOfPeople
+app.get('/create-people-array', (req, res) => {
+    const arrayOfPeople = [
+        {name: 'Person 2', age: 30, favoriteFoods: ['pasta', 'fries', 'pizza']},
+        {name: 'Person 3', age: 21, favoriteFoods: ['pasta', 'pizza', 'burritos']},
+        {name: 'Person 4', age: 20, favoriteFoods: ['pizza', 'burger']},
+        {name: 'Person 5', age: 44, favoriteFoods: ['pasta', 'burger','burritos', 'pizza']},
+        {name: 'Person 6', age: 21, favoriteFoods: ['pasta', 'fries', 'pizza', 'burger']},
+        {name: 'Mary', age: 21, favoriteFoods: ['pasta', 'pizza']},
+        {name: 'Mary', age: 44, favoriteFoods: ['pasta', 'burger', 'pizza']}
+    ]
+    Person.create(arrayOfPeople)
+        .then(result => {
+            res.send(result);
+        })
+        .catch(err => {
+            console.log(err);
+        });
 })
 
 // Getting all People
@@ -85,9 +105,21 @@ app.get('/person1', (req, res) => {
         });
 });
 
+// Getting a Single Person with Certain Favorite Food (Fries)
+app.get('/person-fries', (req, res) => {
+    Person.findOne({ favoriteFoods : 'fries' })
+        .then(result => {
+            res.send(result);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+})
+
 // Getting a certain Person by ID
 app.get('/single-person', (req, res) =>  {
-    Person.findById('64fb57f9152655fc8e8aa21d')
+    const personId = '64fb57f9152655fc8e8aa21d';
+    Person.findById(personId)
         .then(result => {
             res.send(result);
         })
@@ -96,7 +128,80 @@ app.get('/single-person', (req, res) =>  {
         });
 });
 
+// Classic Updates using Find, Edit, then Save
+app.get('/classic-update', (req, res) =>  {
+    const personId = '64fb57f9152655fc8e8aa21d';
+    Person.findById(personId)
+        .then(result => {
+            result.favoriteFoods.push('Hamburger');
+            result.save();
+            res.send(result);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
 
+// Perform New Updates on a Document
+app.get('/find-update', (req, res) =>  {
+    const personName = 'Person 6';
+    Person.findOneAndUpdate(
+        { name: personName },
+        { age: 20 },
+        { new: true },
+    )
+        .then(result => {
+            res.send(result);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
+
+// Delete One Person
+app.get('/delete-person', (req, res) =>  {
+    const personId = '64fb585b152655fc8e8aa21f';
+    Person.findByIdAndRemove(personId)
+        .then(result => {
+            res.send(result);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
+
+// Delete many Documents with same Name (Person 1)
+app.get('/delete-people', (req, res) =>  {
+    const personName = 'Mary';
+    Person.deleteMany({ name: personName })
+        .then(result => {
+            res.send(result);
+            done();
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
+
+// Chain Search Query
+app.get('/chain', (req, res) =>  {
+    Person.find({ favoriteFoods: 'burritos' })
+        .sort('name')
+        .limit(2)
+        .select('-age')
+        .exec()
+        .then(result => {
+            res.send(result);
+            done(null, result);
+        })
+        .catch(err => {
+            console.error(err);
+            done(err, null);
+        });
+});
+
+
+//----------------------------------------------------------------------------------------------------------------
 
 // Default Route (Index)
 app.get('/', (req, res) => {
