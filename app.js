@@ -203,6 +203,8 @@ app.get('/chain', (req, res) =>  {
 
 //----------------------------------------------------------------------------------------------------------------
 
+//INTERFACE ROUTES --> NOT COMPLETED!!
+
 // Default Route (Index)
 app.get('/', (req, res) => {
     res.redirect('/people');
@@ -213,7 +215,6 @@ app.get('/about', (req, res) => {
     res.render('about', { title: 'About' });
 });
   
-
 // 404 page
 app.use((req, res) => {
     res.status(404).render('404', { title: '404' });
